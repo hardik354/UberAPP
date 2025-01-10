@@ -110,3 +110,79 @@ POST /users/login
 ### Notes
 - Email must be a valid email format
 - Password must be at least 6 characters long
+
+## Get User Profile
+Endpoint for retrieving the authenticated user's profile.
+
+### Endpoint
+```
+GET /users/profile
+```
+
+### Headers
+| Field          | Value         | Description                          | Required |
+|----------------|---------------|--------------------------------------|----------|
+| Authorization  | Bearer token  | JWT token received during login      | Yes      |
+
+### Response Status Codes
+| Status Code | Description                               |
+|-------------|------------------------------------------|
+| 200         | Profile successfully retrieved            |
+| 401         | Unauthorized (invalid or missing token)   |
+| 500         | Internal server error                     |
+
+### Example Success Response
+```json
+{
+  "id": "user_id",
+  "firstname": "John",
+  "lastname": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "1234567890"
+}
+```
+
+### Example Error Response
+```json
+{
+  "error": "Unauthorized access"
+}
+```
+
+## Logout User
+Endpoint for logging out the authenticated user.
+
+### Endpoint
+```
+GET /users/logout
+```
+
+### Headers
+| Field          | Value         | Description                          | Required |
+|----------------|---------------|--------------------------------------|----------|
+| Authorization  | Bearer token  | JWT token received during login      | Yes      |
+
+### Response Status Codes
+| Status Code | Description                               |
+|-------------|------------------------------------------|
+| 200         | User successfully logged out              |
+| 401         | Unauthorized (invalid or missing token)   |
+| 500         | Internal server error                     |
+
+### Example Success Response
+```json
+{
+  "message": "Logged out"
+}
+```
+
+### Example Error Response
+```json
+{
+  "error": "Unauthorized access"
+}
+```
+
+### Notes
+- The provided token will be blacklisted after logout
+- Subsequent requests with the same token will be rejected
