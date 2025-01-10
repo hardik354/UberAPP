@@ -61,3 +61,52 @@ POST /users/register
 - Password must be at least 6 characters long
 - Email must be a valid email format
 - Phone number must be a valid format
+
+## Login User
+Endpoint for authenticating existing users.
+
+### Endpoint
+```
+POST /users/login
+```
+
+### Request Body
+| Field     | Type   | Description          | Required |
+|-----------|--------|----------------------|----------|
+| email     | string | User's email address | Yes      |
+| password  | string | User's password      | Yes      |
+
+### Response Status Codes
+| Status Code | Description                               |
+|-------------|------------------------------------------|
+| 200         | User successfully authenticated           |
+| 400         | Bad request (invalid or missing data)     |
+| 401         | Unauthorized (invalid credentials)        |
+| 500         | Internal server error                     |
+
+### Example Request
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "yourpassword123"
+}
+```
+
+### Example Success Response
+```json
+{
+  "message": "User authenticated successfully",
+  "token": "jwt_token"
+}
+```
+
+### Example Error Response
+```json
+{
+  "error": "Invalid email or password"
+}
+```
+
+### Notes
+- Email must be a valid email format
+- Password must be at least 6 characters long
