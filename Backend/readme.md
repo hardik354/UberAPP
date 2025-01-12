@@ -198,16 +198,22 @@ POST /captains/register
 ```
 
 ### Request Body
-| Field         | Type   | Description                     | Required |
-|---------------|--------|---------------------------------|----------|
-| firstname     | string | Captain's first name            | Yes      |
-| lastname      | string | Captain's last name             | No       |
-| email        | string | Captain's email address         | Yes      |
-| password     | string | Captain's password              | Yes      |
-| color        | string | Vehicle color                   | Yes      |
-| plate        | string | Vehicle plate number            | Yes      |
-| capacity     | number | Vehicle passenger capacity      | Yes      |
-| vehicleType  | string | Type of vehicle                 | Yes      |
+```json
+{
+  "fullname": {
+    "firstname": "John",    // Required, minimum 3 characters
+    "lastname": "Smith"     // Optional
+  },
+  "email": "john.smith@example.com",    // Required, valid email format
+  "password": "securepass123",          // Required, minimum 6 characters
+  "vehicle": {
+    "color": "black",                   // Required, minimum 3 characters
+    "plate": "ABC123",                  // Required, minimum 3 characters
+    "capacity": 4,                      // Required, minimum value of 1
+    "vehicleType": "car"               // Required, must be: "car", "motorcycle", or "auto"
+  }
+}
+```
 
 ### Response Status Codes
 | Status Code | Description                               |
@@ -234,7 +240,7 @@ POST /captains/register
 ### Example Success Response
 ```json
 {
-  "message": "Captain registered successfully",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",  // JWT auth token
   "captain": {
     "id": "captain_id",
     "fullname": {
@@ -247,7 +253,9 @@ POST /captains/register
       "plate": "ABC123",
       "capacity": 4,
       "vehicleType": "car"
-    }
+    },
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "updatedAt": "2023-01-01T00:00:00.000Z"
   }
 }
 ```
@@ -267,3 +275,95 @@ POST /captains/register
 - Vehicle plate must be at least 3 characters long
 - Vehicle capacity must be at least 1
 - Vehicle type must be one of: "car", "motorcycle", "auto"
+
+## Login Captain
+### Endpoint
+```
+POST /captains/login
+```
+
+### Request Body
+```json
+{
+  "email": "john.smith@example.com",    // Required, valid email format
+  "password": "securepass123"           // Required, minimum 6 characters
+}
+```
+
+### Success Response (200 OK)
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",  // JWT auth token
+  "captain": {
+    "id": "captain_id",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Smith"
+    },
+    "email": "john.smith@example.com",
+    "vehicle": {
+      "color": "black",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "updatedAt": "2023-01-01T00:00:00.000Z"
+  }
+}
+```
+
+## Get Captain Profile
+### Endpoint
+```
+GET /captains/profile
+```
+
+### Headers
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  // Required, JWT token
+}
+```
+
+### Success Response (200 OK)
+```json
+{
+  "captain": {
+    "id": "captain_id",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Smith"
+    },
+    "email": "john.smith@example.com",
+    "vehicle": {
+      "color": "black",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "updatedAt": "2023-01-01T00:00:00.000Z"
+  }
+}
+```
+
+## Logout Captain
+### Endpoint
+```
+GET /captains/logout
+```
+
+### Headers
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  // Required, JWT token
+}
+```
+
+### Success Response (200 OK)
+```json
+{
+  "message": "Logout successfully"
+}
+```
