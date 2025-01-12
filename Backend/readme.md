@@ -186,3 +186,84 @@ GET /users/logout
 ### Notes
 - The provided token will be blacklisted after logout
 - Subsequent requests with the same token will be rejected
+
+# Captain API Documentation
+
+## Register Captain
+Endpoint for registering new captains in the system.
+
+### Endpoint
+```
+POST /captains/register
+```
+
+### Request Body
+| Field         | Type   | Description                     | Required |
+|---------------|--------|---------------------------------|----------|
+| firstname     | string | Captain's first name            | Yes      |
+| lastname      | string | Captain's last name             | No       |
+| email        | string | Captain's email address         | Yes      |
+| password     | string | Captain's password              | Yes      |
+| color        | string | Vehicle color                   | Yes      |
+| plate        | string | Vehicle plate number            | Yes      |
+| capacity     | number | Vehicle passenger capacity      | Yes      |
+| vehicleType  | string | Type of vehicle                 | Yes      |
+
+### Response Status Codes
+| Status Code | Description                               |
+|-------------|------------------------------------------|
+| 201         | Captain successfully created              |
+| 400         | Bad request (invalid or missing data)     |
+| 409         | Conflict (email already exists)           |
+| 500         | Internal server error                     |
+
+### Example Request
+```json
+{
+  "firstname": "John",
+  "lastname": "Smith",
+  "email": "john.smith@example.com",
+  "password": "securepass123",
+  "color": "black",
+  "plate": "ABC123",
+  "capacity": 4,
+  "vehicleType": "car"
+}
+```
+
+### Example Success Response
+```json
+{
+  "message": "Captain registered successfully",
+  "captain": {
+    "id": "captain_id",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Smith"
+    },
+    "email": "john.smith@example.com",
+    "vehicle": {
+      "color": "black",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  }
+}
+```
+
+### Example Error Response
+```json
+{
+  "error": "Email already exists"
+}
+```
+
+### Notes
+- Password must be at least 6 characters long
+- Email must be a valid email format
+- First name must be at least 3 characters long
+- Vehicle color must be at least 3 characters long
+- Vehicle plate must be at least 3 characters long
+- Vehicle capacity must be at least 1
+- Vehicle type must be one of: "car", "motorcycle", "auto"
