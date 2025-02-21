@@ -1,7 +1,8 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { UserDataContext } from './UserDataContext';
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const UserDataContext = React.createContext();
 
 const UserContext = ({ children }) => {
     const [user, setUser] = useState({
@@ -11,7 +12,7 @@ const UserContext = ({ children }) => {
             lastName: ''
         }
     });
-
+    
     return (
         <UserDataContext.Provider value={{ user, setUser }}>
             {children}

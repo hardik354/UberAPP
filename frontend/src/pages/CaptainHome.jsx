@@ -3,8 +3,10 @@ import React from 'react'
 
 const CaptainHome = () => {
   return (
-    <div>CaptainHome</div>
+    <div>
+      cap
+    </div>
   )
 }
 
-export default CaptainHome
+export default CaptainHome;

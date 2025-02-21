@@ -1,6 +1,8 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios';
+import { UserDataContext } from '../context/UserContext';
 
 const UserSignup = () => {
 
@@ -8,12 +10,16 @@ const UserSignup = () => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  // const [userData, setUserData] = useState({});
+
+  const navigate = useNavigate();
+
   // eslint-disable-next-line no-unused-vars
-  const [userData, setUserData] = useState({});
+  const { user, setUser } = React.useContext(UserDataContext)
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    const newUserData = {
+    const newUser = {
       fullname: {
         firstname: firstName,
         lastname: lastName,
@@ -21,9 +27,14 @@ const UserSignup = () => {
       email: email,
       password: password,
     };
-    setUserData(newUserData);
 
-    // console.log(newUserData); // Log the userData before resetting the states
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser)
+
+    if (response.status === 201) {
+      const data = response.data;
+      setUser(data.user);
+      navigate('/home');
+    }
 
     setEmail('');
     setFirstName('');
