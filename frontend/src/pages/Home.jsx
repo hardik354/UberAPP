@@ -8,9 +8,13 @@ import ConfirmRide from '../components/ConfirmRide';
 import LookingForDriver from '../components/LookingForDriver';
 import WaitingForDriver from '../components/WaitingForDriver';
 import axios from 'axios';
-
+import { SocketContext } from '../context/SocketContext';
+import{UserDataContext} from '../context/UserContext'
+import { useContext } from 'react';
 
 const Home = () => {
+
+
 
   const [pickup, setPickup] = useState('')
   const [destination, setDestination] = useState('')
@@ -31,6 +35,16 @@ const Home = () => {
   const [activeField, setActiveField] = useState(null)
   const [fare, setFare] = useState({})
   const [vehicleType, setVehicleType] = useState(null)
+
+
+  const { socket } = useContext(SocketContext);
+  const {user} = useContext(UserDataContext);
+
+
+  useEffect(() => {
+    socket.emit('join', {userType:'user', userId:user._id})
+  },[user])
+
 
   // ---------------------------------------------------------------------
   const handlePickupChange = async (e) => {

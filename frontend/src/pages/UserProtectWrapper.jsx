@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-unused-vars
+ 
 import React, { useContext, useEffect, useState } from "react";
 import { UserDataContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 
 const UserProtectWrapper = ({ children }) => {
   const navigate = useNavigate();
-  // eslint-disable-next-line no-unused-vars
+   
   const { user, setUser } = useContext(UserDataContext);
   const [isLoading, setIsLoading] = useState(true);
 

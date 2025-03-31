@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-unused-vars
+ 
 import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom';
 import { UserDataContext } from '../context/UserContext';
@@ -9,11 +9,11 @@ const UserLogin = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  // eslint-disable-next-line no-unused-vars
+   
   const [userData, setUserData] = useState({})
 
 
-  // eslint-disable-next-line no-unused-vars
+   
   const { user, setUser } = React.useContext(UserDataContext)
   const navigate = useNavigate()
 
