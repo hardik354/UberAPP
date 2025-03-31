@@ -1,7 +1,7 @@
 import { createContext, useState } from 'react';
-import PropTypes from 'prop-types';
 
-// eslint-disable-next-line react-refresh/only-export-components
+
+
 export const CaptainDataContext = createContext();
 
 const CaptainContext = ({ children }) => {
@@ -29,8 +29,6 @@ const CaptainContext = ({ children }) => {
         </CaptainDataContext.Provider>
     );
 };
-CaptainContext.propTypes = {
-    children: PropTypes.node.isRequired,
-};
+
 
 export default CaptainContext;

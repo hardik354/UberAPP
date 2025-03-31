@@ -367,3 +367,96 @@ GET /captains/logout
   "message": "Logout successfully"
 }
 ```
+
+# Ride API Documentation
+
+## Create Ride
+Endpoint for creating a new ride request.
+
+### Endpoint
+```
+POST /rides/create
+```
+
+### Headers
+| Field          | Value         | Description                          | Required |
+|----------------|---------------|--------------------------------------|----------|
+| Authorization  | Bearer token  | JWT token received during login      | Yes      |
+
+### Request Body
+| Field         | Type   | Description                    | Required |
+|---------------|--------|--------------------------------|----------|
+| pickup        | string | Pickup location address        | Yes      |
+| destination   | string | Destination location address   | Yes      |
+| vehicleType   | string | Type of vehicle (auto/car/moto)| Yes      |
+
+### Response Status Codes
+| Status Code | Description                               |
+|-------------|------------------------------------------|
+| 201         | Ride successfully created                 |
+| 400         | Bad request (invalid or missing data)     |
+| 401         | Unauthorized (invalid token)              |
+| 500         | Internal server error                     |
+
+### Example Request
+```json
+{
+  "pickup": "123 Main St, City",
+  "destination": "456 Park Ave, City",
+  "vehicleType": "car"
+}
+```
+
+### Example Success Response
+```json
+{
+  "id": "ride_id",
+  "user": "user_id",
+  "pickup": "123 Main St, City",
+  "destination": "456 Park Ave, City",
+  "fare": 150,
+  "status": "pending",
+  "otp": "123456"
+}
+```
+
+## Get Fare Estimate
+Endpoint for getting fare estimates for different vehicle types.
+
+### Endpoint
+```
+GET /rides/get-fare
+```
+
+### Headers
+| Field          | Value         | Description                          | Required |
+|----------------|---------------|--------------------------------------|----------|
+| Authorization  | Bearer token  | JWT token received during login      | Yes      |
+
+### Query Parameters
+| Field         | Type   | Description                    | Required |
+|---------------|--------|--------------------------------|----------|
+| pickup        | string | Pickup location address        | Yes      |
+| destination   | string | Destination location address   | Yes      |
+
+### Response Status Codes
+| Status Code | Description                               |
+|-------------|------------------------------------------|
+| 200         | Fare estimates retrieved successfully     |
+| 400         | Bad request (invalid or missing data)     |
+| 401         | Unauthorized (invalid token)              |
+| 500         | Internal server error                     |
+
+### Example Success Response
+```json
+{
+  "auto": 120,
+  "car": 180,
+  "moto": 80
+}
+```
+
+### Notes
+- Fare calculation considers base fare, per km rate, and per minute rate
+- Vehicle types available: auto, car, moto
+- All addresses must be at least 3 characters long

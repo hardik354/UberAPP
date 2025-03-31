@@ -1,19 +1,18 @@
-// eslint-disable-next-line no-unused-vars
+
 import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom';
 import { CaptainDataContext } from '../context/CapatainContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const UserLogin = () => {
+const CaptainLogin = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  // eslint-disable-next-line no-unused-vars
   const [captainData, setCaptainData] = useState({})
 
-  // eslint-disable-next-line no-unused-vars
-  const { captain, setCaptain } = React.useContext(CaptainDataContext);
+
+  const { captain, setCaptain } = useContext(CaptainDataContext);
   const navigate = useNavigate()
 
   const submitHandler = async (e) => {
@@ -85,4 +84,4 @@ const UserLogin = () => {
   )
 }
 
-export default UserLogin;
+export default CaptainLogin;

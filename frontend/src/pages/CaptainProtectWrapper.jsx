@@ -1,9 +1,8 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useContext, useEffect, useState } from 'react'
 import { CaptainDataContext } from '../context/CapatainContext'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import PropTypes from 'prop-types'
+
 
 const CaptainProtectWrapper = ({
     children
@@ -11,7 +10,6 @@ const CaptainProtectWrapper = ({
 
     const token = localStorage.getItem('token')
     const navigate = useNavigate()
-    // eslint-disable-next-line no-unused-vars
     const { captain, setCaptain } = useContext(CaptainDataContext)
     const [isLoading, setIsLoading] = useState(true)
 
@@ -32,11 +30,11 @@ const CaptainProtectWrapper = ({
             }
         }) 
             .catch(err => {
-                console.log(err)
+                // console.log(err)
                 localStorage.removeItem('token')
                 navigate('/captain-login' )
             })
-    }, [navigate, setCaptain, token])
+    }, [token])
 
 
     if (isLoading) {
@@ -52,9 +50,6 @@ const CaptainProtectWrapper = ({
             {children}
         </>
     )
-}
-CaptainProtectWrapper.propTypes = {
-    children: PropTypes.node.isRequired
 }
 
 export default CaptainProtectWrapper

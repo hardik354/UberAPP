@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-
-// eslint-disable-next-line react-refresh/only-export-components
+import React, { useState ,createContext } from 'react';
 export const UserDataContext = React.createContext();
 
 const UserContext = ({ children }) => {
@@ -18,10 +15,6 @@ const UserContext = ({ children }) => {
             {children}
         </UserDataContext.Provider>
     );
-};
-
-UserContext.propTypes = {
-    children: PropTypes.node.isRequired,
 };
 
 export default UserContext;
