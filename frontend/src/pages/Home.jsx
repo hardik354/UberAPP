@@ -263,6 +263,11 @@ const Home = () => {
       {/* ------------------------------------------------- */}
       <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 px-3 py-10 pt-12 translate-y-full  bg-white'>
         < LookingForDriver
+          createRides={createRide}
+          pickup={pickup}
+          destination={destination}
+          fare={fare}
+          vehicleType={vehicleType}
           setVehicleFound={setVehicleFound}
         />
       </div>
