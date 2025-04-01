@@ -28,8 +28,29 @@ const CaptainHome = () => {
     socket.emit('join', {
       userId: captain._id,
       userType: 'captain'
-  })
-  })
+    })
+
+    const updateLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          }
+
+          socket.emit('update-location-captain', {
+            userId: captain._id,
+            location
+          })
+        })
+      }
+    }
+
+    // const locationInterval = setInterval(updateLocation,10000)
+    // return () => clearInterval(locationInterval)
+  }, [])
+
+
 
 
   useGSAP(function () {
@@ -77,18 +98,18 @@ const CaptainHome = () => {
       <div ref={ridePopupPanelRef} className='fixed w-full z-10 bottom-0 
        bg-white translate-y-full px-3 py-10 pt-12'>
         <RidePopUp
-        
-        setConfirmRidePopupPanel={setConfirmRidePopupPanel}
-        setRidePopupPanel={setRidePopupPanel}
+
+          setConfirmRidePopupPanel={setConfirmRidePopupPanel}
+          setRidePopupPanel={setRidePopupPanel}
         />
-        
-        
+
+
       </div>
       <div ref={confirmRidePopupPanelRef} className='fixed w-full h-screen z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
         <ConfirmRidePopUp
           // ride={ride}
           setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel} />
-      </div> 
+      </div>
 
 
 
