@@ -28,7 +28,7 @@ function initializeSocket(server) {
 
     socket.on("update-location-captain", async (data) => {
       const { userId, location } = data;
-      console.log(`Captain ${userId} updated location: ${location}`);
+      // console.log(`Captain ${userId} updated location: ${location}`);
 
       if (!location || !location.ltd || !location.lng) {
         return socket.emit("error", { message: "Could not find location" });
@@ -48,9 +48,12 @@ function initializeSocket(server) {
   });
 }
 
-function sendMessageToSocketId(socketId, message) {
+function sendMessageToSocketId(socketId,  messageObject) {
+
+  console.log(messageObject);
+
   if (io) {
-    io.to(socketId).emit("message", message);
+   io.to(socketId).emit(messageObject.event, messageObject.data);
   } else {
     console.log("Socket not found for id: " + socketId);
   }
