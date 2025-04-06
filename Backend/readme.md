@@ -1,462 +1,293 @@
-# User Registration API Documentation
+# UberAPP Backend API Documentation
 
-## Register User
-Endpoint for registering new users in the system.
+This document describes the endpoints, services, and overall architecture of the Backend. The backend uses Express, Mongoose, JWT authentication, and Socket.io for real-time communication between users and captains.
 
-### Endpoint
-```
-POST /users/register
-```
+## Table of Contents
+- [Setup](#setup)
+- [Environment Variables](#environment-variables)
+- [User Endpoints](#user-endpoints)
+- [Captain Endpoints](#captain-endpoints)
+- [Ride Endpoints](#ride-endpoints)
+- [Payment Endpoints](#payment-endpoints)
+- [Maps Endpoints](#maps-endpoints)
+- [Socket.io Integration](#socketio-integration)
+- [Examples](#examples)
 
-### Request Body
-| Field      | Type   | Description                    | Required |
-|------------|--------|--------------------------------|----------|
-| firstname  | string | User's first name              | Yes      |
-| lastname   | string | User's last name               | Yes      |
-| email      | string | User's email address           | Yes      |
-| password   | string | User's password                | Yes      |
-| phone      | string | User's phone number            | Yes      |
+## Setup
 
-### Response Status Codes
-| Status Code | Description                               |
-|-------------|------------------------------------------|
-| 201         | User successfully created                 |
-| 400         | Bad request (invalid or missing data)     |
-| 409         | Conflict (email already exists)           |
-| 500         | Internal server error                     |
+1. Install dependencies:
+   ```sh
+   npm install
+   ```
+2. Create a `.env` file at the root of the Backend folder with:
+   ```
+   PORT=3000
+   DB_CONNECT=your_mongodb_url
+   JWT_SECRET=your_jwt_secret
+   GOOGLE_MAPS_API=your_google_maps_api_key
+   ```
+3. Start the server:
+   ```sh
+   npm run dev  # if using nodemon or similar
+   ```
 
-### Example Request
-```json
-{
-  "firstname": "John",
-  "lastname": "Doe",
-  "email": "john.doe@example.com",
-  "password": "yourpassword123",
-  "phone": "1234567890"
-}
-```
+## Environment Variables
 
-### Example Success Response
-```json
-{
-  "message": "User registered successfully",
-  "user": {
-    "id": "user_id",
-    "firstname": "John",
-    "lastname": "Doe",
+- **PORT**: Server port (default: 3000)
+- **DB_CONNECT**: MongoDB connection string
+- **JWT_SECRET**: Secret for JWT token generation
+- **GOOGLE_MAPS_API**: API key for Google Maps services
+
+## User Endpoints
+
+### Register User
+- **Endpoint:** `POST /users/register`
+- **Request Body:**
+  ```json
+  {
+    "fullname": { "firstname": "John", "lastname": "Doe" },
     "email": "john.doe@example.com",
+    "password": "yourpassword",
     "phone": "1234567890"
   }
-}
-```
-
-### Example Error Response
-```json
-{
-  "error": "Email already exists"
-}
-```
-
-### Notes
-- Password must be at least 6 characters long
-- Email must be a valid email format
-- Phone number must be a valid format
-
-## Login User
-Endpoint for authenticating existing users.
-
-### Endpoint
-```
-POST /users/login
-```
-
-### Request Body
-| Field     | Type   | Description          | Required |
-|-----------|--------|----------------------|----------|
-| email     | string | User's email address | Yes      |
-| password  | string | User's password      | Yes      |
-
-### Response Status Codes
-| Status Code | Description                               |
-|-------------|------------------------------------------|
-| 200         | User successfully authenticated           |
-| 400         | Bad request (invalid or missing data)     |
-| 401         | Unauthorized (invalid credentials)        |
-| 500         | Internal server error                     |
-
-### Example Request
-```json
-{
-  "email": "john.doe@example.com",
-  "password": "yourpassword123"
-}
-```
-
-### Example Success Response
-```json
-{
-  "message": "User authenticated successfully",
-  "token": "jwt_token"
-}
-```
-
-### Example Error Response
-```json
-{
-  "error": "Invalid email or password"
-}
-```
-
-### Notes
-- Email must be a valid email format
-- Password must be at least 6 characters long
-
-## Get User Profile
-Endpoint for retrieving the authenticated user's profile.
-
-### Endpoint
-```
-GET /users/profile
-```
-
-### Headers
-| Field          | Value         | Description                          | Required |
-|----------------|---------------|--------------------------------------|----------|
-| Authorization  | Bearer token  | JWT token received during login      | Yes      |
-
-### Response Status Codes
-| Status Code | Description                               |
-|-------------|------------------------------------------|
-| 200         | Profile successfully retrieved            |
-| 401         | Unauthorized (invalid or missing token)   |
-| 500         | Internal server error                     |
-
-### Example Success Response
-```json
-{
-  "id": "user_id",
-  "firstname": "John",
-  "lastname": "Doe",
-  "email": "john.doe@example.com",
-  "phone": "1234567890"
-}
-```
-
-### Example Error Response
-```json
-{
-  "error": "Unauthorized access"
-}
-```
-
-## Logout User
-Endpoint for logging out the authenticated user.
-
-### Endpoint
-```
-GET /users/logout
-```
-
-### Headers
-| Field          | Value         | Description                          | Required |
-|----------------|---------------|--------------------------------------|----------|
-| Authorization  | Bearer token  | JWT token received during login      | Yes      |
-
-### Response Status Codes
-| Status Code | Description                               |
-|-------------|------------------------------------------|
-| 200         | User successfully logged out              |
-| 401         | Unauthorized (invalid or missing token)   |
-| 500         | Internal server error                     |
-
-### Example Success Response
-```json
-{
-  "message": "Logged out"
-}
-```
-
-### Example Error Response
-```json
-{
-  "error": "Unauthorized access"
-}
-```
-
-### Notes
-- The provided token will be blacklisted after logout
-- Subsequent requests with the same token will be rejected
-
-# Captain API Documentation
-
-## Register Captain
-Endpoint for registering new captains in the system.
-
-### Endpoint
-```
-POST /captains/register
-```
-
-### Request Body
-```json
-{
-  "fullname": {
-    "firstname": "John",    // Required, minimum 3 characters
-    "lastname": "Smith"     // Optional
-  },
-  "email": "john.smith@example.com",    // Required, valid email format
-  "password": "securepass123",          // Required, minimum 6 characters
-  "vehicle": {
-    "color": "black",                   // Required, minimum 3 characters
-    "plate": "ABC123",                  // Required, minimum 3 characters
-    "capacity": 4,                      // Required, minimum value of 1
-    "vehicleType": "car"               // Required, must be: "car", "motorcycle", or "auto"
+  ```
+- **Success Response:** `201 Created`
+  ```json
+  {
+    "token": "jwt_token_here",
+    "user": { "id": "user_id", "fullname": { "firstname": "John", "lastname": "Doe" }, "email": "john.doe@example.com" }
   }
-}
-```
+  ```
 
-### Response Status Codes
-| Status Code | Description                               |
-|-------------|------------------------------------------|
-| 201         | Captain successfully created              |
-| 400         | Bad request (invalid or missing data)     |
-| 409         | Conflict (email already exists)           |
-| 500         | Internal server error                     |
+### Login User
+- **Endpoint:** `POST /users/login`
+- **Request Body:**
+  ```json
+  {
+    "email": "john.doe@example.com",
+    "password": "yourpassword"
+  }
+  ```
+- **Success Response:** `200 OK`
+  ```json
+  {
+    "token": "jwt_token_here",
+    "user": { "id": "user_id", "fullname": { "firstname": "John", "lastname": "Doe" }, "email": "john.doe@example.com" }
+  }
+  ```
 
-### Example Request
-```json
-{
-  "firstname": "John",
-  "lastname": "Smith",
-  "email": "john.smith@example.com",
-  "password": "securepass123",
-  "color": "black",
-  "plate": "ABC123",
-  "capacity": 4,
-  "vehicleType": "car"
-}
-```
+### Get User Profile
+- **Endpoint:** `GET /users/profile`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Success Response:** `200 OK`
+  ```json
+  {
+    "id": "user_id",
+    "fullname": { "firstname": "John", "lastname": "Doe" },
+    "email": "john.doe@example.com"
+  }
+  ```
 
-### Example Success Response
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",  // JWT auth token
-  "captain": {
-    "id": "captain_id",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Smith"
-    },
+### Logout User
+- **Endpoint:** `GET /users/logout`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Success Response:** `200 OK`
+  ```json
+  { "message": "Logged out" }
+  ```
+
+## Captain Endpoints
+
+### Register Captain
+- **Endpoint:** `POST /captains/register`
+- **Request Body:**
+  ```json
+  {
+    "fullname": { "firstname": "John", "lastname": "Smith" },
     "email": "john.smith@example.com",
+    "password": "securepass123",
     "vehicle": {
       "color": "black",
       "plate": "ABC123",
       "capacity": 4,
       "vehicleType": "car"
-    },
-    "createdAt": "2023-01-01T00:00:00.000Z",
-    "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
   }
-}
-```
+  ```
+- **Success Response:** `201 Created`
+  ```json
+  {
+    "token": "jwt_token_here",
+    "captain": {
+      "id": "captain_id",
+      "fullname": { "firstname": "John", "lastname": "Smith" },
+      "email": "john.smith@example.com",
+      "vehicle": { "color": "black", "plate": "ABC123", "capacity": 4, "vehicleType": "car" }
+    }
+  }
+  ```
 
-### Example Error Response
-```json
-{
-  "error": "Email already exists"
-}
-```
-
-### Notes
-- Password must be at least 6 characters long
-- Email must be a valid email format
-- First name must be at least 3 characters long
-- Vehicle color must be at least 3 characters long
-- Vehicle plate must be at least 3 characters long
-- Vehicle capacity must be at least 1
-- Vehicle type must be one of: "car", "motorcycle", "auto"
-
-## Login Captain
-### Endpoint
-```
-POST /captains/login
-```
-
-### Request Body
-```json
-{
-  "email": "john.smith@example.com",    // Required, valid email format
-  "password": "securepass123"           // Required, minimum 6 characters
-}
-```
-
-### Success Response (200 OK)
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",  // JWT auth token
-  "captain": {
-    "id": "captain_id",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Smith"
-    },
+### Login Captain
+- **Endpoint:** `POST /captains/login`
+- **Request Body:**
+  ```json
+  {
     "email": "john.smith@example.com",
-    "vehicle": {
-      "color": "black",
-      "plate": "ABC123",
-      "capacity": 4,
-      "vehicleType": "car"
-    },
-    "createdAt": "2023-01-01T00:00:00.000Z",
-    "updatedAt": "2023-01-01T00:00:00.000Z"
+    "password": "securepass123"
   }
-}
-```
+  ```
+- **Success Response:** `200 OK` with captain details in the response.
 
-## Get Captain Profile
-### Endpoint
-```
-GET /captains/profile
-```
+### Get Captain Profile
+- **Endpoint:** `GET /captains/profile`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Response:** Captain profile details.
 
-### Headers
-```json
-{
-  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  // Required, JWT token
-}
-```
+### Logout Captain
+- **Endpoint:** `GET /captains/logout`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Success Response:** `200 OK`
+  ```json
+  { "message": "Logout successfully" }
+  ```
 
-### Success Response (200 OK)
-```json
-{
-  "captain": {
-    "id": "captain_id",
-    "fullname": {
-      "firstname": "John",
-      "lastname": "Smith"
-    },
-    "email": "john.smith@example.com",
-    "vehicle": {
-      "color": "black",
-      "plate": "ABC123",
-      "capacity": 4,
-      "vehicleType": "car"
-    },
-    "createdAt": "2023-01-01T00:00:00.000Z",
-    "updatedAt": "2023-01-01T00:00:00.000Z"
+## Ride Endpoints
+
+### Create Ride
+- **Endpoint:** `POST /rides/create`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Request Body:**
+  ```json
+  {
+    "pickup": "123 Main St, City",
+    "destination": "456 Park Ave, City",
+    "vehicleType": "car"
   }
-}
-```
+  ```
+- **Success Response:** `201 Created`
+  ```json
+  {
+    "id": "ride_id",
+    "user": "user_id",
+    "pickup": "123 Main St, City",
+    "destination": "456 Park Ave, City",
+    "fare": 150,
+    "status": "pending",
+    "otp": "123456"
+  }
+  ```
+*After creation, the backend also emits a "new-ride" socket event for all nearby captains.*
 
-## Logout Captain
-### Endpoint
-```
-GET /captains/logout
-```
+### Get Fare Estimate
+- **Endpoint:** `GET /rides/get-fare`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Query Params:** `pickup` and `destination`
+- **Success Response:** `200 OK`
+  ```json
+  {
+    "auto": 120,
+    "car": 180,
+    "moto": 80
+  }
+  ```
 
-### Headers
-```json
-{
-  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  // Required, JWT token
-}
-```
+### Confirm Ride (Captain)
+- **Endpoint:** `POST /rides/confirm`
+- **Headers:** `Authorization: Bearer captain_jwt_token`
+- **Request Body:**
+  ```json
+  {
+    "rideId": "ride_id"
+  }
+  ```
+- **Success Response:** `200 OK` (emits a "ride-confirmed" event to the user)
 
-### Success Response (200 OK)
-```json
-{
-  "message": "Logout successfully"
-}
-```
+### Start Ride (Captain)
+- **Endpoint:** `GET /rides/start-ride`
+- **Headers:** `Authorization: Bearer captain_jwt_token`
+- **Query Params:** `rideId` and `otp`
+- **Success Response:** `200 OK` (emits a "ride-started" event to the user)
 
-# Ride API Documentation
+### End Ride (Captain)
+- **Endpoint:** `POST /rides/end-ride`
+- **Headers:** `Authorization: Bearer captain_jwt_token`
+- **Request Body:**
+  ```json
+  { "rideId": "ride_id" }
+  ```
+- **Success Response:** `200 OK` (emits a "ride-ended" event to the user)
 
-## Create Ride
-Endpoint for creating a new ride request.
+## Payment Endpoints
 
-### Endpoint
-```
-POST /rides/create
-```
+### Confirm Payment
+- **Endpoint:** `POST /payment/confirm`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Request Body:**
+  ```json
+  {
+    "rideId": "ride_id",
+    "method": "cash", // or "upi"
+    "upiId": "example@upi" // provide only for UPI payments
+  }
+  ```
+- **Success Response:** `200 OK`
+  ```json
+  {
+    "message": "Payment successful",
+    "ride": { /* ride data with updated payment details */ }
+  }
+  ```
+*This endpoint simulates payment confirmation and notifies the captain via socket ("payment-received" event).*
 
-### Headers
-| Field          | Value         | Description                          | Required |
-|----------------|---------------|--------------------------------------|----------|
-| Authorization  | Bearer token  | JWT token received during login      | Yes      |
+## Maps Endpoints
 
-### Request Body
-| Field         | Type   | Description                    | Required |
-|---------------|--------|--------------------------------|----------|
-| pickup        | string | Pickup location address        | Yes      |
-| destination   | string | Destination location address   | Yes      |
-| vehicleType   | string | Type of vehicle (auto/car/moto)| Yes      |
+### Get Coordinates
+- **Endpoint:** `GET /maps/get-coordinates`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Query Param:** `address`
+- **Success Response:** `200 OK`
+  ```json
+  { "ltd": 12.9716, "lng": 77.5946 }
+  ```
 
-### Response Status Codes
-| Status Code | Description                               |
-|-------------|------------------------------------------|
-| 201         | Ride successfully created                 |
-| 400         | Bad request (invalid or missing data)     |
-| 401         | Unauthorized (invalid token)              |
-| 500         | Internal server error                     |
+### Get Distance & Time
+- **Endpoint:** `GET /maps/get-distance-time`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Query Params:** `origin`, `destination`
+- **Success Response:** `200 OK`
+  ```json
+  {
+    "distance": { "value": 15000, "text": "15 km" },
+    "duration": { "value": 1800, "text": "30 mins" }
+  }
+  ```
 
-### Example Request
-```json
-{
-  "pickup": "123 Main St, City",
-  "destination": "456 Park Ave, City",
-  "vehicleType": "car"
-}
-```
+### Get Suggestions
+- **Endpoint:** `GET /maps/get-suggestions`
+- **Headers:** `Authorization: Bearer jwt_token_here`
+- **Query Param:** `input`
+- **Success Response:** `200 OK`
+  ```json
+  [{ "description": "Address suggestion 1" }, { "description": "Address suggestion 2" }]
+  ```
 
-### Example Success Response
-```json
-{
-  "id": "ride_id",
-  "user": "user_id",
-  "pickup": "123 Main St, City",
-  "destination": "456 Park Ave, City",
-  "fare": 150,
-  "status": "pending",
-  "otp": "123456"
-}
-```
+## Socket.io Integration
 
-## Get Fare Estimate
-Endpoint for getting fare estimates for different vehicle types.
+- The backend initializes Socket.io in `socket.js` to manage real-time notifications.
+- On user or captain login, a socket is joined and the server stores the socket ID.
+- Examples:
+  - When a ride is created, a "new-ride" event is emitted to captains.
+  - When payment is confirmed, a "payment-received" event is sent to the captain.
+  - When a ride is started or ended, corresponding events notify the user.
 
-### Endpoint
-```
-GET /rides/get-fare
-```
+## Architecture Summary
 
-### Headers
-| Field          | Value         | Description                          | Required |
-|----------------|---------------|--------------------------------------|----------|
-| Authorization  | Bearer token  | JWT token received during login      | Yes      |
+- Express handles routing and middleware.
+- Mongoose models represent users, captains, rides, and token blacklisting.
+- JWT manages authentication.
+- Socket.io provides real-time ride and payment updates.
+- Google Maps API services provide geocoding, distance, and autocomplete functionality.
 
-### Query Parameters
-| Field         | Type   | Description                    | Required |
-|---------------|--------|--------------------------------|----------|
-| pickup        | string | Pickup location address        | Yes      |
-| destination   | string | Destination location address   | Yes      |
+---
 
-### Response Status Codes
-| Status Code | Description                               |
-|-------------|------------------------------------------|
-| 200         | Fare estimates retrieved successfully     |
-| 400         | Bad request (invalid or missing data)     |
-| 401         | Unauthorized (invalid token)              |
-| 500         | Internal server error                     |
-
-### Example Success Response
-```json
-{
-  "auto": 120,
-  "car": 180,
-  "moto": 80
-}
-```
-
-### Notes
-- Fare calculation considers base fare, per km rate, and per minute rate
-- Vehicle types available: auto, car, moto
-- All addresses must be at least 3 characters long
+Feel free to extend the documentation as needed.
