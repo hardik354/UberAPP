@@ -1,8 +1,6 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom' // Added useLocation
-import { useEffect, useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { SocketContext } from '../context/SocketContext'
-import { useNavigate } from 'react-router-dom'
 import LiveTracking from '../components/LiveTracking'
 
 const Riding = () => {
@@ -11,9 +9,20 @@ const Riding = () => {
   const location = useLocation()
   const { ride } = location.state || {} // Retrieve ride data
 
-  socket.on("ride-ended", () => {
-    navigate('/home')
-  })
+  useEffect(() => {
+    socket.on("ride-ended", () => {
+      navigate('/payment', { state: { ride } })
+    })
+
+    socket.on("payment-trigger", (data) => {
+      navigate('/payment', { state: { ride: data.ride } })
+    })
+
+    return () => {
+      socket.off("ride-ended")
+      socket.off("payment-trigger")
+    }
+  }, [socket, navigate, ride])
 
   return (
     <div className='h-screen'>
@@ -39,7 +48,7 @@ const Riding = () => {
             <div className='flex items-center gap-5 p-3 border-b-2'>
               <i className="text-lg ri-map-pin-2-fill"></i>
               <div>
-                <h3 className='text-lg font-medium'>562/11-A</h3>
+                <h3 className='text-lg font-medium'>Destination</h3>
                 <p className='text-sm -mt-1 text-gray-600'>{ride?.destination}</p>
               </div>
             </div>

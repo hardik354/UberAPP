@@ -42,6 +42,17 @@ function initializeSocket(server) {
       });
     });
 
+    socket.on("trigger-payment", async (data) => {
+      const { userId, ride } = data;
+      const user = await userModel.findById(userId);
+      if (user && user.socketId) {
+        sendMessageToSocketId(user.socketId, {
+          event: "payment-trigger",
+          data: { ride }
+        });
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log(`Client disconnected: ${socket.id}`);
     });

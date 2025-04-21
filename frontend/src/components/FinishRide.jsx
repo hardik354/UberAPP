@@ -2,28 +2,41 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { SocketContext } from '../context/SocketContext'
+import { useContext } from 'react'
 
 
 const FinishRide = (props) => {
 
     const navigate = useNavigate()
+    const { socket } = useContext(SocketContext)
 
     async function endRide() {
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/end-ride`, {
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}/rides/end-ride`,
+                {
+                    rideId: props.ride._id
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            )
 
-            rideId: props.ride._id
-
-
-        }, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
+            if (response.status === 200) {
+                // Emit event to trigger payment for user
+                socket.emit('trigger-payment', {
+                    userId: props.ride.user._id,
+                    ride: props.ride
+                })
+                navigate('/captain-home')
             }
-        })
-
-        if (response.status === 200) {
-            navigate('/captain-home')
+        } catch (error) {
+            console.error(error)
+            alert("Could not end ride")
         }
-
     }
 
     return (
@@ -47,7 +60,7 @@ const FinishRide = (props) => {
                     <div className='flex items-center gap-5 p-3 border-b-2'>
                         <i className="ri-map-pin-user-fill"></i>
                         <div>
-                            <h3 className='text-lg font-medium'>562/11-A</h3>
+                            <h3 className='text-lg font-medium'>Pickup</h3>
                             <p className='text-sm -mt-1 text-gray-600'>
 
                                 {props.ride?.pickup}
@@ -58,7 +71,7 @@ const FinishRide = (props) => {
                     <div className='flex items-center gap-5 p-3 border-b-2'>
                         <i className="text-lg ri-map-pin-2-fill"></i>
                         <div>
-                            <h3 className='text-lg font-medium'>562/11-A</h3>
+                            <h3 className='text-lg font-medium'>Destination</h3>
                             <p className='text-sm -mt-1 text-gray-600'>
 
                                 {props.ride?.destination}

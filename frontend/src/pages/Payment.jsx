@@ -28,6 +28,7 @@ const Payment = () => {
         }
       );
       if (response.status === 200) {
+        alert("Payment successful!")
         navigate('/home');
       }
     } catch (error) {
